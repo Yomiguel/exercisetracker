@@ -26,7 +26,11 @@ const exerciseDataSchema = new Schema({
   duration: Number,
   date: Date,
 });
-const logSchema = new Schema({ username: String, count: Number, log: Array });
+const logSchema = new Schema({
+  username: String,
+  count: Number,
+  log: Array,
+});
 
 const User = mongoose.model("user", usersDataSchema);
 const Exercise = mongoose.model("exercise", exerciseDataSchema);
@@ -53,6 +57,48 @@ app.get("/api/users", async (req, res) => {
     return { username: user.username, _id: user["_id"] };
   });
   res.send(usersList);
+});
+
+app.post("/api/users/:_id/exercises", async (req, res) => {
+  const userSeeker = await User.findById(req.params._id);
+  if (req.body.date) {
+    new Exercise({
+      username: userSeeker.username,
+      description: req.body.description,
+      duration: req.body.duration,
+      date: new Date(req.body.date),
+    }).save((error) => {
+      if (error) {
+        return handlerError(error);
+      }
+    });
+    res.json({
+      username: userSeeker.username,
+      description: req.body.description,
+      duration: req.body.duration,
+      date: new Date(req.body.date).toDateString(),
+      _id: req.params._id,
+    });
+  } else {
+    new Exercise({
+      username: userSeeker.username,
+      description: req.body.description,
+      duration: req.body.duration,
+      date: new Date(),
+    }).save((error) => {
+      if (error) {
+        return handlerError(error);
+      }
+    });
+    const date = await Exercise.findOne({ username: userSeeker.username });
+    res.json({
+      username: userSeeker.username,
+      description: req.body.description,
+      duration: req.body.duration,
+      date: date.date.toDateString(),
+      _id: req.params._id,
+    });
+  }
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
