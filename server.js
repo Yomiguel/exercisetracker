@@ -26,15 +26,9 @@ const exerciseDataSchema = new Schema({
   duration: Number,
   date: Date,
 });
-const logSchema = new Schema({
-  username: String,
-  count: Number,
-  log: Array,
-});
 
 const User = mongoose.model("user", usersDataSchema);
 const Exercise = mongoose.model("exercise", exerciseDataSchema);
-const Log = mongoose.model("log", logSchema);
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
@@ -47,14 +41,14 @@ app.post("/api/users", async (req, res) => {
     }
   });
   const userSeeker = await User.findOne({ username: req.body.username });
-  res.json({ username: userSeeker.username, _id: userSeeker["_id"] });
+  res.json({ username: userSeeker.username, _id: userSeeker._id });
 });
 
 app.get("/api/users", async (req, res) => {
   const namePattern = /[\s\S]/;
   const allUsers = await User.find({ username: namePattern });
   const usersList = allUsers.map((user) => {
-    return { username: user.username, _id: user["_id"] };
+    return { username: user.username, _id: user._id };
   });
   res.send(usersList);
 });
@@ -97,6 +91,100 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
       duration: req.body.duration,
       date: date.date.toDateString(),
       _id: req.params._id,
+    });
+  }
+});
+
+app.get("/api/users/:_id/logs", async (req, res) => {
+  const { from, to, limit } = req.query;
+  const userSeeker = await User.findById(req.params._id);
+
+  if (from && to && limit) {
+    const dataExercise = await Exercise.find({
+      username: userSeeker.username,
+      date: { $gt: new Date(from), $lt: new Date(to) },
+    }).limit(limit);
+    const exerciseList = dataExercise.map((data) => {
+      return {
+        description: data.description,
+        duration: data.duration,
+        date: data.date.toDateString(),
+      };
+    });
+    res.json({
+      username: userSeeker.username,
+      count: exerciseList.length,
+      _id: userSeeker._id,
+      log: exerciseList,
+    });
+  } else if (from && to) {
+    const dataExercise = await Exercise.find({
+      username: userSeeker.username,
+      date: { $gt: new Date(from), $lt: new Date(to) },
+    });
+    const exerciseList = dataExercise.map((data) => {
+      return {
+        description: data.description,
+        duration: data.duration,
+        date: data.date.toDateString(),
+      };
+    });
+    res.json({
+      username: userSeeker.username,
+      count: exerciseList.length,
+      _id: userSeeker._id,
+      log: exerciseList,
+    });
+  } else if (from && limit) {
+    const dataExercise = await Exercise.find({
+      username: userSeeker.username,
+      date: { $gt: new Date(from) },
+    }).limit(limit);
+    const exerciseList = dataExercise.map((data) => {
+      return {
+        description: data.description,
+        duration: data.duration,
+        date: data.date.toDateString(),
+      };
+    });
+    res.json({
+      username: userSeeker.username,
+      count: exerciseList.length,
+      _id: userSeeker._id,
+      log: exerciseList,
+    });
+  } else if (to && limit) {
+    const dataExercise = await Exercise.find({
+      username: userSeeker.username,
+      date: { $lt: new Date(to) },
+    }).limit(limit);
+    const exerciseList = dataExercise.map((data) => {
+      return {
+        description: data.description,
+        duration: data.duration,
+        date: data.date.toDateString(),
+      };
+    });
+    res.json({
+      username: userSeeker.username,
+      count: exerciseList.length,
+      _id: userSeeker._id,
+      log: exerciseList,
+    });
+  } else {
+    const dataExercise = await Exercise.find({ username: userSeeker.username });
+    const exerciseList = dataExercise.map((data) => {
+      return {
+        description: data.description,
+        duration: data.duration,
+        date: data.date.toDateString(),
+      };
+    });
+    res.json({
+      username: userSeeker.username,
+      count: exerciseList.length,
+      _id: userSeeker._id,
+      log: exerciseList,
     });
   }
 });
