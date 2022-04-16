@@ -66,7 +66,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         date: new Date(req.body.date),
       });
       res.json({
-        _id: exercise._id,
+        _id: userSeeker._id,
         username: exercise.username,
         date: exercise.date.toDateString(),
         description: exercise.description,
@@ -80,7 +80,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         date: new Date(),
       });
       res.json({
-        _id: exercise._id,
+        _id: userSeeker._id,
         username: exercise.username,
         date: exercise.date.toDateString(),
         description: exercise.description,
