@@ -68,9 +68,9 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
       res.json({
         _id: exercise._id,
         username: exercise.username,
+        date: exercise.date.toDateString(),
         description: exercise.description,
         duration: exercise.duration,
-        date: exercise.date.toDateString(),
       });
     } else {
       const exercise = await Exercise.create({
@@ -82,9 +82,9 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
       res.json({
         _id: exercise._id,
         username: exercise.username,
-        description: exercise.description,
-        duration: exercise.duration,
         date: exercise.date.toDateString(),
+        duration: exercise.duration,
+        description: exercise.description,        
       });
     }
   } catch (error) {
