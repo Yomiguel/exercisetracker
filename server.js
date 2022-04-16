@@ -35,67 +35,60 @@ app.get("/", (req, res) => {
 
 app.post("/api/users", async (req, res) => {
   try {
-    await new User({ username: req.body.username }).save((error) => {
-      if (error) {
-        return handlerError(error);
-      }
-    });
-    const userSeeker = await User.findOne({ username: req.body.username });
-    res.json({ username: userSeeker.username, _id: userSeeker._id });
+    const user = await User.create({ username: req.body.username });
+    res.json({ username: user.username, _id: user._id });
   } catch (error) {
-    console.log(error);
-     res.json({ error }); 
+    res.send(error);
   }
 });
 
 app.get("/api/users", async (req, res) => {
-  const namePattern = /[\s\S]/;
-  const allUsers = await User.find({ username: namePattern });
-  const usersList = allUsers.map((user) => {
-    return { username: user.username, _id: user._id };
-  });
-  res.send(usersList);
+  try {
+    const namePattern = /[\s\S]/;
+    const allUsers = await User.find({ username: namePattern });
+    const usersList = allUsers.map((user) => {
+      return { username: user.username, _id: user._id };
+    });
+    res.send(usersList);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.post("/api/users/:_id/exercises", async (req, res) => {
-  const userSeeker = await User.findById(req.params._id);
-  if (req.body.date) {
-    new Exercise({
-      username: userSeeker.username,
-      description: req.body.description,
-      duration: req.body.duration,
-      date: new Date(req.body.date),
-    }).save((error) => {
-      if (error) {
-        return handlerError(error);
-      }
-    });
-    res.json({
-      username: userSeeker.username,
-      description: req.body.description,
-      duration: req.body.duration,
-      date: new Date(req.body.date).toDateString(),
-      _id: req.params._id,
-    });
-  } else {
-    new Exercise({
-      username: userSeeker.username,
-      description: req.body.description,
-      duration: req.body.duration,
-      date: new Date(),
-    }).save((error) => {
-      if (error) {
-        return handlerError(error);
-      }
-    });
-    const date = await Exercise.findOne({ username: userSeeker.username });
-    res.json({
-      username: userSeeker.username,
-      description: req.body.description,
-      duration: req.body.duration,
-      date: date.date.toDateString(),
-      _id: req.params._id,
-    });
+  try {
+    const userSeeker = await User.findById(req.params._id);
+    if (req.body.date) {
+      const exercise = await Exercise.create({
+        username: userSeeker.username,
+        description: req.body.description,
+        duration: req.body.duration,
+        date: new Date(req.body.date),
+      });
+      res.json({
+        username: exercise.username,
+        description: exercise.description,
+        duration: exercise.duration,
+        date: exercise.date.toDateString(),
+        _id: exercise._id,
+      });
+    } else {
+      const exercise = await Exercise.create({
+        username: userSeeker.username,
+        description: req.body.description,
+        duration: req.body.duration,
+        date: new Date(),
+      });
+      res.json({
+        username: exercise.username,
+        description: exercise.description,
+        duration: exercise.duration,
+        date: exercise.date.toDateString(),
+        _id: exercise._id,
+      });
+    }
+  } catch (error) {
+    res.send(error);
   }
 });
 
