@@ -2,9 +2,6 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const moongose = require("mongoose");
-const { default: mongoose } = require("mongoose");
-const response = require("express");
-const { handle } = require("express/lib/application");
 require("dotenv").config();
 
 app.use(cors());
