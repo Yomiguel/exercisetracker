@@ -35,13 +35,18 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/users", async (req, res) => {
-  new User({ username: req.body.username }).save((error) => {
-    if (error) {
-      return handlerError(error);
-    }
-  });
-  const userSeeker = await User.findOne({ username: req.body.username });
-  res.json({ username: userSeeker.username, _id: userSeeker._id });
+  try {
+    await new User({ username: req.body.username }).save((error) => {
+      if (error) {
+        return handlerError(error);
+      }
+    });
+    const userSeeker = await User.findOne({ username: req.body.username });
+    res.json({ username: userSeeker.username, _id: userSeeker._id });
+  } catch (error) {
+    console.log(error);
+    /* res.json({ error }); */
+  }
 });
 
 app.get("/api/users", async (req, res) => {
