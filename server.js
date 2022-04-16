@@ -9,7 +9,6 @@ require("dotenv").config();
 
 app.use(cors());
 app.use(express.static("public"));
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 moongose.connect(process.env.MONGO_URI, {
@@ -45,7 +44,7 @@ app.post("/api/users", async (req, res) => {
     res.json({ username: userSeeker.username, _id: userSeeker._id });
   } catch (error) {
     console.log(error);
-    /* res.json({ error }); */
+     res.json({ error }); 
   }
 });
 
