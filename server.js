@@ -168,6 +168,59 @@ app.get("/api/users/:_id/logs", async (req, res) => {
       _id: userSeeker._id,
       log: exerciseList,
     });
+  } else if (from) {
+    const dataExercise = await Exercise.find({
+      username: userSeeker.username,
+      date: { $gt: new Date(from) },
+    });
+    const exerciseList = dataExercise.map((data) => {
+      return {
+        description: data.description,
+        duration: data.duration,
+        date: data.date.toDateString(),
+      };
+    });
+    res.json({
+      username: userSeeker.username,
+      count: exerciseList.length,
+      _id: userSeeker._id,
+      log: exerciseList,
+    });
+  } else if (to) {
+    const dataExercise = await Exercise.find({
+      username: userSeeker.username,
+      date: { $lt: new Date(to) },
+    });
+    const exerciseList = dataExercise.map((data) => {
+      return {
+        description: data.description,
+        duration: data.duration,
+        date: data.date.toDateString(),
+      };
+    });
+    res.json({
+      username: userSeeker.username,
+      count: exerciseList.length,
+      _id: userSeeker._id,
+      log: exerciseList,
+    });
+  } else if (limit) {
+    const dataExercise = await Exercise.find({
+      username: userSeeker.username,
+    }).limit(limit);
+    const exerciseList = dataExercise.map((data) => {
+      return {
+        description: data.description,
+        duration: data.duration,
+        date: data.date.toDateString(),
+      };
+    });
+    res.json({
+      username: userSeeker.username,
+      count: exerciseList.length,
+      _id: userSeeker._id,
+      log: exerciseList,
+    });
   } else {
     const dataExercise = await Exercise.find({ username: userSeeker.username });
     const exerciseList = dataExercise.map((data) => {
